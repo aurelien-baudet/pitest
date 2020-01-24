@@ -14,6 +14,9 @@
  */
 package org.pitest.mutationtest.report.html;
 
+import static org.pitest.mutationtest.DetectionStatus.KILLED;
+import static org.pitest.mutationtest.report.html.MutationScoreUtil.groupBySameMutationOnSameLines;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -58,6 +61,7 @@ public class MutationTestSummaryData {
     mt.addLines(getNumberOfLines());
     mt.addLinesCovered(this.numberOfCoveredLines);
     mt.addMutationsWithCoverage(this.getNumberOfMutationsWithCoverage());
+    mt.addMutationScore(new MutationScore(getNumberOfUniqueMutations(), getNumberOfUniqueMutationsKilled(), getNumberOfUniqueMutationsDetected()));
     return mt;
   }
 
@@ -141,6 +145,36 @@ public class MutationTestSummaryData {
     return count;
   }
 
+  private long getNumberOfUniqueMutations() {
+    return groupBySameMutationOnSameLines(mutations).entrySet().size();
+  }
+
+  private long getNumberOfUniqueMutationsDetected() {
+    int count = 0;
+    for (final Collection<MutationResult> results : groupBySameMutationOnSameLines(mutations).values()) {
+      for (MutationResult each : results) {
+        if (each.getStatus().isDetected()) {
+          count++;
+          break;
+        }
+      }
+    }
+    return count;
+  }
+
+  private long getNumberOfUniqueMutationsKilled() {
+    int count = 0;
+    for (final Collection<MutationResult> results : groupBySameMutationOnSameLines(mutations).values()) {
+      for (MutationResult each : results) {
+        if (each.getStatus() == KILLED) {
+          count++;
+          break;
+        }
+      }
+    }
+    return count;
+  }
+  
   private Function<MutationResult, Iterable<TestInfo>> mutationToTargettedTests() {
     return a -> a.getDetails().getTestsInOrder();
   }

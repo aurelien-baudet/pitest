@@ -6,6 +6,8 @@ import org.pitest.classinfo.ClassInfo;
 import org.pitest.mutationtest.DetectionStatus;
 import org.pitest.mutationtest.MutationResult;
 import org.pitest.mutationtest.MutationStatusTestPair;
+import org.pitest.mutationtest.engine.MutationDetails;
+import org.pitest.mutationtest.engine.MutationIdentifier;
 import org.pitest.mutationtest.engine.gregor.MethodMutatorFactory;
 import org.pitest.mutationtest.engine.gregor.config.Mutator;
 
@@ -180,7 +182,11 @@ public class MutationTestSummaryDataTest {
   }
 
   private MutationResult aMutationResult(DetectionStatus status) {
-    return new MutationResult(null, new MutationStatusTestPair(1, status, "A test"));
+    return new MutationResult(aMutationDetails(), new MutationStatusTestPair(1, status, "A test"));
+  }
+
+  private MutationDetails aMutationDetails() {
+	return new MutationDetails(new MutationIdentifier(null, 0, null), null, "", 0, 0);
   }
 
   private MutationTestSummaryData buildSummaryDataMutators() {
